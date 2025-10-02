@@ -6,8 +6,8 @@ export interface OCRRequest extends Request {
   file?: Express.Multer.File;
   body: {
     ocrMethod?: 'tesseract' | 'ocrspace' | 'both';
-    extractStructuredData?: boolean;
-    cleanText?: boolean;
+    extractStructuredData?: boolean | string;
+    cleanText?: boolean | string;
   };
 }
 
@@ -32,11 +32,15 @@ export const handleOCR = async (req: OCRRequest, res: Response, next: NextFuncti
 
     console.log(`Processing OCR for file: ${req.file.filename} using method: ${ocrMethod}`);
 
+    // Convert string/boolean to boolean properly
+    const shouldExtractStructuredData = extractStructuredData === true || extractStructuredData === 'true';
+    const shouldCleanText = cleanText === true || cleanText === 'true';
+
     // Process the receipt
     const result: OCRResult = await ocrService.processReceipt(req.file.path, {
       ocrMethod,
-      extractStructuredData: extractStructuredData === true || extractStructuredData === 'true',
-      cleanText: cleanText === true || cleanText === 'true'
+      extractStructuredData: shouldExtractStructuredData,
+      cleanText: shouldCleanText
     });
 
     // Clean up uploaded file after processing
@@ -162,10 +166,11 @@ export const healthCheck = async (req: Request, res: Response) => {
 
     res.json(health);
   } catch (error) {
+    const err = error as Error;
     res.status(500).json({
       service: 'OCR Service',
       status: 'unhealthy',
-      error: error.message
+      error: err.message
     });
   }
 };

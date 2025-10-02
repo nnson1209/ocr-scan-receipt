@@ -61,8 +61,9 @@ export class OCRService {
         processingTime
       };
     } catch (error) {
-      console.error('Tesseract OCR failed:', error);
-      throw new Error(`Tesseract OCR failed: ${error.message}`);
+      const err = error as Error;
+      console.error('Tesseract OCR failed:', err);
+      throw new Error(`Tesseract OCR failed: ${err.message}`);
     }
   }
 
@@ -94,8 +95,9 @@ export class OCRService {
         processingTime
       };
     } catch (error) {
-      console.error('OCR Space failed:', error);
-      throw new Error(`OCR Space failed: ${error.message}`);
+      const err = error as Error;
+      console.error('OCR Space failed:', err);
+      throw new Error(`OCR Space failed: ${err.message}`);
     }
   }
 
@@ -128,7 +130,8 @@ export class OCRService {
           try {
             return await this.extractTextWithOCRSpace(filePath);
           } catch (ocrSpaceError) {
-            console.warn('OCR Space failed, trying Tesseract:', ocrSpaceError.message);
+            const err = ocrSpaceError as Error;
+            console.warn('OCR Space failed, trying Tesseract:', err.message);
             return await this.extractTextWithTesseract(filePath);
           }
       }
@@ -196,8 +199,9 @@ Return only valid JSON, no explanations:`;
         throw new Error('Invalid JSON response from AI');
       }
     } catch (error) {
-      console.error('OpenAI extraction failed:', error);
-      throw new Error(`AI extraction failed: ${error.message}`);
+      const err = error as Error;
+      console.error('OpenAI extraction failed:', err);
+      throw new Error(`AI extraction failed: ${err.message}`);
     }
   }
 
@@ -230,7 +234,8 @@ Return only valid JSON, no explanations:`;
           const textToProcess = ocrResult.processedText || ocrResult.rawText;
           ocrResult.extractedData = await this.extractStructuredData(textToProcess);
         } catch (aiError) {
-          console.warn('AI extraction failed, continuing without structured data:', aiError.message);
+          const err = aiError as Error;
+          console.warn('AI extraction failed, continuing without structured data:', err.message);
         }
       }
 
